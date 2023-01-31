@@ -17,4 +17,3 @@ programmet läser varje rad och lägger den sista ordet i raden i listan eller a
 
 syftet med programmet är att göra receptet lite finare men mainly skall den bah behöva göra om måttet till svenska. 
 config.json kommer innehålla storleken på new line samt måttens omvandlingar.
-hellu
