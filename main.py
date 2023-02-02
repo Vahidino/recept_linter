@@ -27,16 +27,17 @@ def main():
     fluid_ounces_to_Liters = json_data["fluid_ounces_to_Liters"]
 
     file_dir = arg.file # get the file path from the arguments
+    file = open(file_dir, "r", encoding="utf-8").read() # öppnar filen
     
     output_file = file_dir.split('.')[0] + '_EU_validated.' + file_dir.split('.')[1]
 
-    EU_validated = accuallcorrection.Ounces_to_Grams
-    EU_validated = accuallcorrection.Pounds_to_Kilograms
-    EU_validated = accuallcorrection.Gallons_to_Liters
-    EU_validated = accuallcorrection.Quarts_to_Liters
-    EU_validated = accuallcorrection.Pints_to_Liters
-    EU_validated = accuallcorrection.Cups_to_Liters 
-    EU_validated = accuallcorrection.fluid_ounces_to_Liters
+    EU_validated = accuallcorrection.Ounces_to_Grams(file, Ounces_to_Grams)
+    EU_validated = accuallcorrection.Pounds_to_Kilograms(EU_validated, Pounds_to_Kilograms)
+    EU_validated = accuallcorrection.Gallons_to_Liters(EU_validated, Gallons_to_Liters)
+    EU_validated = accuallcorrection.Quarts_to_Liters(EU_validated, Quarts_to_Liters)
+    EU_validated = accuallcorrection.Pints_to_Liters(EU_validated, Pints_to_Liters)
+    EU_validated = accuallcorrection.Cups_to_Liters (EU_validated, Cups_to_Liters)
+    EU_validated = accuallcorrection.fluid_ounces_to_Liters(EU_validated, fluid_ounces_to_Liters)
 
     with open(output_file, 'w') as f: # skriver till outputfilen
         f.write(EU_validated)
