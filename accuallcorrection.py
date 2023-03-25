@@ -1,6 +1,15 @@
 
 def Ounces_to_Grams(file, Ounces_to_Grams):
+
     EU_validated = ""
+    index = file.find(Ounces_to_Grams)
+
+    separated_string = file[:index].strip()
+    ounces = float(separated_string.split)
+    grams = ounces * Ounces_to_Grams
+    
+    form_1 = str(grams) + "Grams"           
+    EU_validated = file.replace(separated_string, form_1)
     return EU_validated
 
 def Pounds_to_Kilograms(file, Pounds_to_Kilograms):

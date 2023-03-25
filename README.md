@@ -11,7 +11,8 @@ Ingriens:
 1/2 cup sugar
 1/2 cup butter
 1/2 cup milk
-
+ 
+ mst ha krav som den tillåter inte negativa tal.
 programmet läser varje rad och lägger den sista ordet i raden i listan eller att den tarvet redan delen som skall översättas till svenska så sätts resten av raden till listan.
 
 
