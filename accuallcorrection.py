@@ -1,16 +1,16 @@
-
-def Ounces_to_Grams(file, Ounces_to_Grams):
-
-    EU_validated = ""
-    index = file.find(str(Ounces_to_Grams))
+"""this file will do the covertion of the units to the EU standard."""
+def ounces_to_grams(file, ounce_to_gram):
+    """This function converts ounces to grams."""
+    eu_validated = ""
+    index = file.find(str(ounce_to_gram))
 
     separated_string = file[:index].strip()
     ounces = float(separated_string.split()[0])
-    grams = ounces * Ounces_to_Grams
-    
-    form_1 = str(grams) + " Gram"           
-    EU_validated = file.replace(separated_string, form_1)
-    return EU_validated
+    grams = ounces * ounce_to_gram
+
+    form_1 = str(grams) + " Gram"
+    eu_validated = file.replace(separated_string, form_1)
+    return eu_validated
 
 """ def Pounds_to_Kilograms(file, Pounds_to_Kilograms):
     EU_validated = ""    
