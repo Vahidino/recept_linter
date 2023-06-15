@@ -5,5 +5,5 @@
     "quarts_to_liters" : 0.95,
     "pints_to_liters" : 0.47,
     "cups_to_liters" : 0.24,
-    "fluid_ounces_to_liters" : 0.03
+    "fluid_ounces_to_mililiters" : 0.03
 }

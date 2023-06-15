@@ -18,3 +18,12 @@ programmet läser varje rad och lägger den sista ordet i raden i listan eller a
 
 syftet med programmet är att göra receptet lite finare men mainly skall den bah behöva göra om måttet till svenska. 
 config.json kommer innehålla storleken på new line samt måttens omvandlingar.
+
+
+\d+ matches one or more digits (0-9).
+(\.\d+)? matches an optional decimal part preceded by a dot. It captures the decimal part if it exists.
+(\d+(\.\d+)?) matches the whole number, including an optional decimal part.
+ounces matches the literal string "ounces" following the number.
+So, the regular expression pattern (\d+(\.\d+)?) ounces will match values like "2 ounces", "1.5 ounces", "0.25 ounces", etc., in the input file.
+
+When using re.findall() with this pattern, it will find all occurrences of the pattern in the file and return a list of matched values.
