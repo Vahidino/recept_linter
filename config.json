@@ -4,6 +4,6 @@
     "gallons_to_liters" : 3.78,
     "quarts_to_liters" : 0.95,
     "pints_to_liters" : 0.47,
-    "cups_to_liters" : 0.24,
+    "cups_to_deciliters" : 2.4 ,
     "fluid_ounces_to_mililiters" : 0.03
 }
