@@ -116,7 +116,7 @@ def ingredient_linter(file):
 
 
 def fix_instructions(file, ingredients):
-    """This function fixes the instructions formatting."""
+    """This function fixes the instructions formatting and converts measurements."""
     for ingredient in ingredients:
         file = file.replace(f"{ingredient}.", f"{ingredient}.\n")
 
