@@ -37,11 +37,9 @@ def main():
     global fluid_ounces_to_milliliters_ratio
     fluid_ounces_to_milliliters_ratio = json_data["fluid_ounces_to_milliliters"]
 
-    # Initialize Pygame and show the main menu
+    # Initialize pygame
     pygame.init()
-    game.show_main_menu()
-
-    # Rest of your code goes here
+    game.show_main_menu()  # This line is moved inside the main() function
 
 if __name__ == "__main__":
     main()

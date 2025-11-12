@@ -2,6 +2,8 @@ import sys
 import tkinter as tk
 from tkinter import filedialog
 import pygame
+import game
+import main
 import accuallcorrection as accuall_correction
 
 pygame.init()
@@ -28,9 +30,9 @@ def show_main_menu():
                     file_path = open_file_dialog()
                     if file_path:
                         # Convert the selected file
-                        game.convert_file(file_path, ounces_to_grams_ratio, pounds_to_kilograms_ratio, gallons_to_liters_ratio,
-                                          quart_to_liters_ratio, pints_to_liters_ratio, cups_to_liters_ratio,
-                                          fluid_ounces_to_milliliters_ratio)
+                        game.convert_file(file_path, main.ounces_to_grams_ratio, main.pounds_to_kilograms_ratio, main.gallons_to_liters_ratio,
+                                          main.quart_to_liters_ratio, main.pints_to_liters_ratio, main.cups_to_liters_ratio,
+                                          main.fluid_ounces_to_milliliters_ratio)
  
                 elif event.key == pygame.K_2:
                     # Code to handle 'Options' option
