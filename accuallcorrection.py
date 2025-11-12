@@ -1,16 +1,11 @@
-<<<<<<< Updated upstream
 """this file contains the actual correction functions."""
 import re
-=======
-EU_validated = ""
->>>>>>> Stashed changes
 
 def ounces_to_grams(file, ounce_to_gram):
     """This function converts ounces to grams."""
     ounces_pattern = r'(\d+(\.\d+)?) ounces'
     matches = re.findall(ounces_pattern, file)
 
-<<<<<<< Updated upstream
     for match in matches:
         ounces = float(match[0])
         grams = round(ounces * ounce_to_gram, 2)
@@ -126,47 +121,3 @@ def fix_instructions(file, ingredients):
         file = file.replace(f"{ingredient}.", f"{ingredient}.\n")
 
     return file
-=======
-    index_one = file.find(str(Ounces_to_Grams))
-
-    separated_string = file[:index_one].strip()
-    ounces = float(separated_string.split()[0])
-    gram = ounces * Ounces_to_Grams
-    
-    form_1 = str(gram) + " Gram"           
-    EU_validated = file.replace(separated_string, form_1)
-    return EU_validated
-
-def Pounds_to_Kilograms(file, Pounds_to_Kilograms):
-    index_two = file.find(str(Pounds_to_Kilograms))
-
-    separated_string_t = file[:index_two].strip()
-    pounds = float(separated_string_t.split()[0])
-    kilogram = pounds * Pounds_to_Kilograms
-    
-    form_2 = str(kilogram) + " Kilogram"
-    EU_validated = file.replace(separated_string_t, form_2)
-    print(index_two)
-    return EU_validated
-
-"""def Gallons_to_Liters(file, Gallons_to_Liters):
-      
-    return EU_validated 
-
-def Quarts_to_Liters(file, Quarts_to_Liters):
-            
-    return EU_validated
-
-def Pints_to_Liters(file, Pints_to_Liters):
-    
-    return EU_validated
-
-def Cups_to_Liters(file, Cups_to_Liters):
-    
-    return EU_validated
-
-def fluid_ounces_to_Liters(file, fluid_ounces_to_Liters):
-       
-    return EU_validated
-"""
->>>>>>> Stashed changes
