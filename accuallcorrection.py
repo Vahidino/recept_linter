@@ -1,123 +1,155 @@
-"""this file contains the actual correction functions."""
+"""
+This file contains all the text transformation logic for the recipe linter.
+Each function takes the file content as a string, finds all matches 
+for a specific unit using regex, converts it, and formats it.
+"""
 import re
 
-def ounces_to_grams(file, ounce_to_gram):
-    """This function converts ounces to grams."""
-    ounces_pattern = r'(\d+(\.\d+)?) ounces'
-    matches = re.findall(ounces_pattern, file)
+# --- FORMATTING HELPERS ---
 
-    for match in matches:
-        ounces = float(match[0])
-        grams = round(ounces * ounce_to_gram, 2)
-        grams_formatted = f"{grams} g"
-        file = re.sub(ounces_pattern, grams_formatted, file, count=1)
+def round_to_nearest_5(value):
+    """Helper function to round a value to the nearest 5."""
+    return int(5 * round(float(value) / 5))
 
-    return file
+def format_weight(grams):
+    """
+    Takes a gram value and returns a smart, kitchen-friendly string.
+    - Under 1000g -> "g" (rounded to nearest 5g)
+    - 1000g or more -> "Kg" (rounded to 1 decimal)
+    """
+    if grams < 1000:
+        rounded_grams = round_to_nearest_5(grams)
+        return f"{rounded_grams} g"
+    else:
+        kilograms = round(grams / 1000, 1)
+        return f"{kilograms} Kg"
 
+def format_volume(milliliters):
+    """
+    Takes a milliliter value and returns a smart, kitchen-friendly string.
+    - Under 100 ml -> "ml" (rounded to nearest 5ml)
+    - 100-999 ml  -> "dl" (rounded to 1 decimal)
+    - 1000 ml or more -> "L" (rounded to 1 decimal)
+    """
+    if milliliters < 100:
+        rounded_ml = round_to_nearest_5(milliliters)
+        return f"{rounded_ml} ml"
+    elif milliliters < 1000:
+        deciliters = round(milliliters / 100, 1)
+        return f"{deciliters} dl"
+    else:
+        liters = round(milliliters / 1000, 1)
+        return f"{liters} L"
 
-def pounds_to_kilograms(file, pound_to_kilogram):
-    """This function converts pounds to kilograms."""
-    pounds_pattern = r'(\d+(\.\d+)?) lb'
-    matches = re.findall(pounds_pattern, file)
+# --- PRE-PROCESSING FUNCTIONS ---
 
-    for match in matches:
-        pounds = float(match[0])
-        kilograms = round(pounds * pound_to_kilogram, 2)
-        kilograms_formatted = f"{kilograms} Kg"
-        file = re.sub(pounds_pattern, kilograms_formatted, file, count=1)
+def convert_fractions_to_decimals(file_content):
+    """
+    Finds common text fractions (e.g., "1 1/2", "1/4") and converts
+    them to decimal strings ("1.5", "0.25") so they can be
+    parsed as floats by other functions.
+    """
+    # Handle mixed numbers first (e.g., "1 1/2" -> "1.5")
+    file_content = re.sub(r'(\d+)\s+1/2', r'\1.5', file_content)
+    file_content = re.sub(r'(\d+)\s+1/4', r'\1.25', file_content)
+    file_content = re.sub(r'(\d+)\s+3/4', r'\1.75', file_content)
+    file_content = re.sub(r'(\d+)\s+1/3', r'\1.33', file_content)
+    file_content = re.sub(r'(\d+)\s+2/3', r'\1.66', file_content)
+    
+    # Handle standalone fractions (e.g., "1/2" -> "0.5")
+    # \b = word boundary, prevents matching "1/2" in "11/2"
+    file_content = re.sub(r'\b1/2\b', '0.5', file_content, flags=re.IGNORECASE)
+    file_content = re.sub(r'\b1/4\b', '0.25', file_content, flags=re.IGNORECASE)
+    file_content = re.sub(r'\b3/4\b', '0.75', file_content, flags=re.IGNORECASE)
+    file_content = re.sub(r'\b1/3\b', '0.33', file_content, flags=re.IGNORECASE)
+    file_content = re.sub(r'\b2/3\b', '0.66', file_content, flags=re.IGNORECASE)
+    return file_content
 
-    return file
+def format_instructions_simple(file_content):
+    """
+    Improves readability of instructions by adding a blank line
+    after a sentence-ending period (e.g., ". New sentence").
+    """
+    # Uses a positive lookahead (?=[A-Z]) to find a period, a space,
+    # and then an uppercase letter, without consuming the letter.
+    formatted_content = re.sub(r'\.\s+(?=[A-Z])', '.\n\n', file_content)
+    return formatted_content
 
+# --- UNIT CONVERSION FUNCTIONS ---
 
-def gallons_to_liters(file, gallon_to_liter):
-    """This function converts gallons to liters."""
-    gallons_pattern = r'(\d+(\.\d+)?) gallons'
-    matches = re.findall(gallons_pattern, file)
+# --- Weight ---
+def convert_ounces(file_content, grams_per_ounce):
+    """Finds "ounce" or "oz" and converts to smart-formatted grams."""
+    pattern = r'(\d+(\.\d+)?)\s+(ounces|ounce|ozs|oz)\b(\.?)'
+    def repl(match):
+        grams = float(match.group(1)) * grams_per_ounce
+        return format_weight(grams)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
-    for match in matches:
-        gallons = float(match[0])
-        liters = round(gallons * gallon_to_liter, 2)
-        liters_formatted = f"{liters} L"
-        file = re.sub(gallons_pattern, liters_formatted, file, count=1)
+def convert_pounds(file_content, grams_per_pound):
+    """Finds "pound" or "lb" and converts to smart-formatted g/Kg."""
+    pattern = r'(\d+(\.\d+)?)\s+(pounds|pound|lbs|lb)\b(\.?)'
+    def repl(match):
+        grams = float(match.group(1)) * grams_per_pound
+        return format_weight(grams)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
-    return file
+# --- Volume ---
+def convert_gallons(file_content, ml_per_gallon):
+    """Finds "gallon" or "gal" and converts to smart-formatted ml/dl/L."""
+    pattern = r'(\d+(\.\d+)?)\s+(gallons|gallon|gal)\b(\.?)'
+    def repl(match):
+        milliliters = float(match.group(1)) * ml_per_gallon
+        return format_volume(milliliters)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
+def convert_quarts(file_content, ml_per_quart):
+    """Finds "quart" or "qt" and converts to smart-formatted ml/dl/L."""
+    pattern = r'(\d+(\.\d+)?)\s+(quarts|quart|qts|qt)\b(\.?)'
+    def repl(match):
+        milliliters = float(match.group(1)) * ml_per_quart
+        return format_volume(milliliters)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
-def quart_to_liters(file, quart_to_liter):
-    """This function converts quarts to liters."""
-    quarts_pattern = r'(\d+(\.\d+)?) quarts'
-    matches = re.findall(quarts_pattern, file)
+def convert_pints(file_content, ml_per_pint):
+    """Finds "pint" or "pt" and converts to smart-formatted ml/dl/L."""
+    pattern = r'(\d+(\.\d+)?)\s+(pints|pint|pts|pt)\b(\.?)'
+    def repl(match):
+        milliliters = float(match.group(1)) * ml_per_pint
+        return format_volume(milliliters)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
-    for match in matches:
-        quarts = float(match[0])
-        liters = round(quarts * quart_to_liter, 2)
-        liters_formatted = f"{liters} L"
-        file = re.sub(quarts_pattern, liters_formatted, file, count=1)
+def convert_cups(file_content, ml_per_cup):
+    """Finds "cup" or "c" and converts to smart-formatted ml/dl/L."""
+    pattern = r'(\d+(\.\d+)?)\s+(cups|cup|c)\b(\.?)'
+    def repl(match):
+        milliliters = float(match.group(1)) * ml_per_cup
+        return format_volume(milliliters)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
-    return file
+def convert_fluid_ounces(file_content, ml_per_fl_oz):
+    """Finds "fluid ounce" or "fl oz" and converts to smart-formatted ml/dl/L."""
+    # This pattern is more complex to catch "fl. oz." "fl oz" etc.
+    pattern = r'(\d+(\.\d+)?)\s+(fluid\s+ounce(s?)|fl(\.?)\s*oz(\.?))\b'
+    def repl(match):
+        milliliters = float(match.group(1)) * ml_per_fl_oz
+        return format_volume(milliliters)
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)
 
+# --- Temperature ---
+def convert_fahrenheit_to_celsius(file_content):
+    """
+    Finds Fahrenheit values (e.g., "350 F", "400°F") and converts to Celsius,
+    rounded to the nearest 5°C for practical oven use.
+    """
+    # Pattern: (Number) (optional space/°) (F or Fahrenheit)
+    pattern = r'(\d+(\.\d+)?)\s*(°?)\s*(F|Fahrenheit)\b'
+    
+    def repl(match):
+        fahrenheit = float(match.group(1))
+        celsius_exact = (fahrenheit - 32) * 5 / 9
+        # Use our kitchen-friendly rounding
+        celsius_rounded = round_to_nearest_5(celsius_exact)
+        return f"{celsius_rounded}°C"
 
-def pints_to_liters(file, pint_to_liter):
-    """This function converts pints to liters."""
-    pints_pattern = r'(\d+(\.\d+)?) pints'
-    matches = re.findall(pints_pattern, file)
-
-    for match in matches:
-        pints = float(match[0])
-        liters = round(pints * pint_to_liter, 2)
-        liters_formatted = f"{liters} L"
-        file = re.sub(pints_pattern, liters_formatted, file, count=1)
-
-    return file
-
-
-def cups_to_deciliters(file, cup_to_deciliter):
-    """This function converts cups to liters."""
-    cups_pattern = r'(\d+(\.\d+)?) cups'
-    matches = re.findall(cups_pattern, file)
-
-    for match in matches:
-        cups = float(match[0])
-        deciliter = round(cups * cup_to_deciliter,2)
-        deciliters_formatted = f"{deciliter} Dl"
-        file = re.sub(cups_pattern, deciliters_formatted, file, count=1)
-
-    return file
-
-
-def fluid_ounces_to_mililiters(file, fluid_ounce_to_milliliter):
-    """This function converts fluid ounces to milliliters."""
-    fluid_ounces_pattern = r'(\d+(\.\d+)?) fluid ounces'
-    matches = re.findall(fluid_ounces_pattern, file)
-
-    for match in matches:
-        fluid_ounces = float(match[0])
-        milliliters = round(fluid_ounces * fluid_ounce_to_milliliter, 2)
-        milliliters_formatted = f"{milliliters} Ml"
-        file = re.sub(fluid_ounces_pattern, milliliters_formatted, file, count=1)
-
-    return file
-
-def ingredient_linter(file):
-    """This function performs linting for ingredient formatting."""
-    ingredients = []
-    lines = file.splitlines()
-
-    ingredient_keywords = ["ounces", "lb", "gallons", "quarts", "pints", "cups", "fluid ounces"]  # Add more keywords as needed
-
-    for line in lines:
-        for keyword in ingredient_keywords:
-            if keyword in line:
-                ingredients.append(line)
-                break
-
-    return ingredients
-
-
-
-def fix_instructions(file, ingredients):
-    """This function fixes the instructions formatting and converts measurements."""
-    for ingredient in ingredients:
-        file = file.replace(f"{ingredient}.", f"{ingredient}.\n")
-
-    return file
+    return re.sub(pattern, repl, file_content, flags=re.IGNORECASE)

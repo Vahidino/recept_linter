@@ -1,45 +1,58 @@
 import json
+import os
 import pygame
-import game
-import accuallcorrection as accuall_correction
-
-# Global variables for conversion ratios
-ounces_to_grams_ratio = 0.0
-pounds_to_kilograms_ratio = 0.0
-gallons_to_liters_ratio = 0.0
-quart_to_liters_ratio = 0.0
-pints_to_liters_ratio = 0.0
-cups_to_liters_ratio = 0.0
-fluid_ounces_to_milliliters_ratio = 0.0
+import sys
+import tkinter as tk
+from tkinter import messagebox
+import game # The UI controller
 
 def main():
-    print("Your recipe has been converted to the EU standard.")
+    """
+    Main entry point for the application.
+    Loads configuration and starts the game/UI loop.
+    """
+    print("Starting Recipe Converter...")
 
-    config_path = "C:\\Users\\Shade\\Documents\\GitHub\\recept_linter\\config.json"
-    config_path = config_path.replace("main.py", "config.json")
+    # --- Robust Config Loading ---
+    # We must load config before initializing Pygame, as the app
+    # cannot run without it.
+    try:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(base_dir, "config.json")
+        
+        with open(config_path, "r", encoding="utf-8") as json_file:
+            json_data = json.load(json_file)
+            
+    except FileNotFoundError:
+        error_msg = f"CRITICAL ERROR: config.json was not found.\n\nThe application looked for it at:\n{config_path}\n\nPlease make sure config.json is in the same folder as main.py."
+        print(error_msg)
+        # We can't use Pygame (it's not init'd), so use Tkinter for the error
+        tk_root = tk.Tk()
+        tk_root.withdraw()
+        messagebox.showerror("Fatal Error", error_msg)
+        return # Exit the application
+    except json.JSONDecodeError:
+        error_msg = f"CRITICAL ERROR: config.json is corrupted and could not be read.\n\nPlease check the file for syntax errors."
+        print(error_msg)
+        tk_root = tk.Tk()
+        tk_root.withdraw()
+        messagebox.showerror("Fatal Error", error_msg)
+        return # Exit the application
+    except Exception as e:
+        error_msg = f"An unknown error occurred while loading config:\n{e}"
+        print(error_msg)
+        tk_root = tk.Tk()
+        tk_root.withdraw()
+        messagebox.showerror("Fatal Error", error_msg)
+        return # Exit the application
 
-    with open(config_path, "r", encoding="utf-8") as json_file:
-        json_data = json.load(json_file)
-
-    # Update the global variables with the conversion ratios
-    global ounces_to_grams_ratio
-    ounces_to_grams_ratio = json_data["ounces_to_grams"]
-    global pounds_to_kilograms_ratio
-    pounds_to_kilograms_ratio = json_data["pounds_to_kilograms"]
-    global gallons_to_liters_ratio
-    gallons_to_liters_ratio = json_data["gallons_to_liters"]
-    global quart_to_liters_ratio
-    quart_to_liters_ratio = json_data["quarts_to_liters"]
-    global pints_to_liters_ratio
-    pints_to_liters_ratio = json_data["pints_to_liters"]
-    global cups_to_liters_ratio
-    cups_to_liters_ratio = json_data["cups_to_deciliters"]
-    global fluid_ounces_to_milliliters_ratio
-    fluid_ounces_to_milliliters_ratio = json_data["fluid_ounces_to_milliliters"]
-
-    # Initialize pygame
+    # --- Start Pygame Application ---
+    # We only get here if the config was loaded successfully.
+    
     pygame.init()
-    game.show_main_menu()  # This line is moved inside the main() function
+    
+    # Pass the loaded config data to the UI controller
+    game.show_main_menu(json_data) 
 
 if __name__ == "__main__":
     main()

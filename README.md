@@ -1,29 +1,92 @@
-Tanke proccess
+Recipe Converter
+A standalone Python application designed to parse and convert American recipes into metric units, making them easy to use for a global audience. The app features a clean, multi-screen graphical user interface built with Pygame.
 
-projectet skall vara en redigerare för amerikanska recept
-vad den skall göra är att omvandla amerikanska mått till svenska 
-dessutom skall den kunna dela upp instruktionerna i stycken för bättre läsning, har en ide med att den gör newline efter den hittar en ingridiens med en punkt efter sig.
-Dvs måste programmet veta vad en ingidens är och vad en ickerelevant ord är.
-Min tanke är att använda en dictionary för att hålla koll på ord och deras betydelse. Eller att använda en lista med ord som är ingridiens, hur jag tänker är mainly basserat på strukturen som t.ex
+💡 About The Project
+This project was built to solve a common problem: finding a recipe online only to discover all measurements are in obscure imperial units like cups, ounces, and pounds, with temperatures in Fahrenheit.
 
-Ingriens:
-1 1/2 cups flour 
-1/2 cup sugar
-1/2 cup butter
-1/2 cup milk
- 
- mst ha krav som den tillåter inte negativa tal.
-programmet läser varje rad och lägger den sista ordet i raden i listan eller att den tarvet redan delen som skall översättas till svenska så sätts resten av raden till listan.
+This tool not only converts these units but also intelligently formats them into kitchen-friendly values (e.g., 0.7 Kg becomes 700 g) and improves the readability of the instructions.
 
+The project is built entirely in Python, using Pygame for the UI rendering and Tkinter for handling native OS file dialogs.
 
-syftet med programmet är att göra receptet lite finare men mainly skall den bah behöva göra om måttet till svenska. 
-config.json kommer innehålla storleken på new line samt måttens omvandlingar.
+✨ Key Features
+Smart Weight Conversion: Converts pounds (lb) and ounces (oz) to grams.
 
+Smart Logic: Automatically displays values < 1000g as g (e.g., 700 g) and values > 1000g as Kg (e.g., 1.2 Kg).
 
-\d+ matches one or more digits (0-9).
-(\.\d+)? matches an optional decimal part preceded by a dot. It captures the decimal part if it exists.
-(\d+(\.\d+)?) matches the whole number, including an optional decimal part.
-ounces matches the literal string "ounces" following the number.
-So, the regular expression pattern (\d+(\.\d+)?) ounces will match values like "2 ounces", "1.5 ounces", "0.25 ounces", etc., in the input file.
+Smart Volume Conversion: Converts cups, gallons, quarts, pints, and fluid ounces (fl oz) to milliliters.
 
-When using re.findall() with this pattern, it will find all occurrences of the pattern in the file and return a list of matched values.
+Smart Logic: Automatically selects the best unit to display: ml, dl, or L (e.g., 946 ml becomes 9.5 dl).
+
+Temperature Conversion: Finds and converts temperatures from Fahrenheit (°F, F) to Celsius (°C), rounding to the nearest 5°C for practical oven use.
+
+Fraction Handling: Automatically finds and converts text fractions (e.g., 1 1/2 cups, 1/4 oz) into decimals before conversion.
+
+Instruction Linter: Improves readability by automatically inserting blank lines between instruction steps.
+
+Polished GUI:
+
+Clean, multi-screen interface (Main, Options, Help).
+
+Custom font rendering.
+
+Interactive buttons with color-coded hover effects (Primary, Default, Danger).
+
+Robust & Stable:
+
+Strong error handling for missing files (config.json) or read/write errors.
+
+Clean project architecture with a "Separation of Concerns" (SoC) model.
+
+🏗️ Project Architecture
+The project is structured with a clean separation of concerns to make it maintainable and scalable:
+
+/Recipe-Linter
+│
+├── 📜 main.py
+│   └── (Entry Point) Initializes Pygame, loads configuration, and starts the UI.
+│
+├── 🖥️ game.py
+│   └── (UI Controller) Manages all UI state, rendering (Pygame), and user input.
+│
+├── ⚙️ app_logic.py
+│   └── (Logic/Action Handler) Handles all file I/O (Tkinter dialogs) and triggers conversions.
+│
+├── 🔬 accuallcorrection.py
+│   └── (Conversion Engine) Contains all the core regex, text-parsing, and unit conversion logic.
+│
+├── 📄 config.json
+│   └── Stores all conversion ratios (e.g., "pounds_to_grams": 453.5).
+│
+├── 🖼️ font.ttf
+│   └── The custom font asset used for rendering all text.
+│
+├── 📦 requirements.txt
+│   └── A list of all Python dependencies (Pygame).
+│
+└── 📖 README.md
+    └── (You are here!)
+🚀 How To Run
+Clone the repository:
+
+Bash
+
+git clone https://github.com/Vahidino/recept_linter.git
+cd recept-linter
+Set up a virtual environment (Recommended):
+
+Bash
+
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+Install dependencies: The project relies on Pygame, which is listed in requirements.txt.
+
+Bash
+
+pip install -r requirements.txt
+Get the font: This project uses a custom font. Please download a .ttf font (e.g., Roboto from Google Fonts) and place it in the root folder, renaming it to font.ttf.
+
+Run the application:
+
+Bash
+
+python main.py

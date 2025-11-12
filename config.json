@@ -1,9 +1,9 @@
 {
-    "ounces_to_grams" : 28,
-    "pounds_to_kilograms" : 0.45,
-    "gallons_to_liters" : 3.78,
-    "quarts_to_liters" : 0.95,
-    "pints_to_liters" : 0.47,
-    "cups_to_deciliters" : 2.4 ,
-    "fluid_ounces_to_mililiters" : 0.03
+  "ounces_to_grams": 28.35,
+  "pounds_to_grams": 453.5,
+  "gallons_to_milliliters": 3785,
+  "quarts_to_milliliters": 946,
+  "pints_to_milliliters": 473,
+  "cups_to_milliliters": 240,
+  "fluid_ounces_to_milliliters": 29.57
 }
